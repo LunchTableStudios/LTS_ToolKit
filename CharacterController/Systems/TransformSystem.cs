@@ -3,7 +3,7 @@ namespace LTS_ToolKit.CharacterController
     using UnityEngine;
     using Unity.Entities;
     using Unity.Mathematics;
-
+    
     public class TransformSystem : ComponentSystem
     {
         private struct TransformEntityFilter

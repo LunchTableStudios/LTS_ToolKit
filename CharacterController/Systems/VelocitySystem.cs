@@ -4,6 +4,7 @@ namespace LTS_ToolKit.CharacterController
     using Unity.Entities;
     using Unity.Mathematics;
 
+    [ UpdateBefore( typeof( TransformSystem ) ) ]
     public class VelocitySystem : ComponentSystem
     {
         private struct VelocityEntityFilter
