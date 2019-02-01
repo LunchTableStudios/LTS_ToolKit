@@ -48,8 +48,7 @@ namespace LTS_ToolKit.CharacterController
                 if( delta.y != 0 )
                     HandleVerticalCollision( ref delta, collider.edgeRadius, collisionData, raycastData  );
 
-                if( collisionData.Below )
-                    velocity.Value.y = 0;
+                NeutralizeVelocity( ref velocity, collisionData );
 
                 velocity.Delta = delta;
             }
@@ -240,6 +239,21 @@ namespace LTS_ToolKit.CharacterController
             data.VerticalRaySpacing = verticalSpacing;
 
             return data;
+        }
+
+        private void NeutralizeVelocity( ref Velocity velocity, CollisionData collisionData )
+        {
+            if( collisionData.Above && ( velocity.Value.y > 0 || collisionData.ascendingSlope ) )
+                velocity.Value.y = 0;
+
+            if( collisionData.Below && ( velocity.Value.y < 0 || collisionData.decendingSlope ) )
+                velocity.Value.y = 0;
+
+            if( collisionData.Right && velocity.Value.x > 0 )
+                velocity.Value.x = 0;
+
+            if( collisionData.Left && velocity.Value.x < 0 )
+                velocity.Value.x = 0;
         }
     }
 }
