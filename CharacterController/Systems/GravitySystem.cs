@@ -3,6 +3,7 @@ namespace LTS_ToolKit.CharacterController
     using UnityEngine;
     using Unity.Entities;
 
+    [ UpdateBefore( typeof( VelocitySystem ) ) ]
     public class GravitySystem : ComponentSystem
     {
         private struct GravityEntityFilter

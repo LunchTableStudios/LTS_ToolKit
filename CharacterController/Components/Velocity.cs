@@ -5,7 +5,7 @@ namespace LTS_ToolKit.CharacterController
 
     public class Velocity : MonoBehaviour
     {
-        public float2 Value;
-        public float2 Delta;
+        public float2 Value = float2.zero;
+        public float2 Delta = float2.zero;
     }
 }
