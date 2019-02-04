@@ -5,34 +5,8 @@ namespace LTS_ToolKit.Controls
 
     public class Input : MonoBehaviour
     {
-        [ System.Serializable ]
-        public class AxisAction
-        {
-            public string Name;
-            public float Value;
-
-            public AxisAction( string name )
-            {
-                Name = name;
-                Value = 0;
-            }
-        }
-
-        [ System.Serializable ]
-        public class ButtonAction
-        {
-            public string Name;
-            public bool Value;
-
-            public ButtonAction( string name )
-            {
-                Name = name;
-                Value = false;
-            }
-        }
-
         public int Id;
-        public List<AxisAction> Axis = new List<AxisAction>();
-        public List<ButtonAction> Buttons = new List<ButtonAction>();
+        public Dictionary<string, float> Axis = new Dictionary<string, float>();
+        public Dictionary<string, bool> Buttons = new Dictionary<string, bool>();
     }
 }
