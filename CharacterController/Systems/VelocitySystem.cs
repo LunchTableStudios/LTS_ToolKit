@@ -19,6 +19,7 @@ namespace LTS_ToolKit.CharacterController
             {
                 Velocity velocity = entity.VelocityComponent;
                 velocity.Delta = velocity.Value * deltaTime;
+                velocity.Value *= velocity.Friction;
             }
         }
     }

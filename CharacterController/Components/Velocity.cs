@@ -7,5 +7,6 @@ namespace LTS_ToolKit.CharacterController
     {
         public float2 Value = float2.zero;
         public float2 Delta = float2.zero;
+        public float Friction = 0.9f;
     }
 }
