@@ -8,9 +8,14 @@ namespace LTS_ToolKit.Controls
 
     public class InputSystem : ComponentSystem
     {
-        private struct InputEntityFilter
+        private struct AxisInputEntityFilter
         {
-            public Input InputComponent;
+            public AxisInput InputComponent;
+        }
+
+        private struct ButtonInputEntityFilter
+        {
+            public ButtonInput InputComponent;
         }
 
         private IList<InputAction> actions;
@@ -18,54 +23,52 @@ namespace LTS_ToolKit.Controls
         protected override void OnStartRunning()
         {
             actions = ReInput.mapping.Actions;
-
-            foreach( InputEntityFilter entity in GetEntities<InputEntityFilter>() )
-            {
-                Input input = entity.InputComponent;
-
-                InitializeActions( input );
-            }
         }
 
         protected override void OnUpdate()
         {
-            foreach( InputEntityFilter entity in GetEntities<InputEntityFilter>() )
-            {
-                Input input = entity.InputComponent;
-                Player rewiredPlayer = ( input.Id != 0 ) ? ReInput.players.GetPlayer( input.Id ) : ReInput.players.GetSystemPlayer();
-
-                for ( int i = 0; i < Mathf.Max( input.Axis.Count, input.Buttons.Count ); i++ )
-                {
-                    if( i < input.Axis.Count )
-                    {
-                        KeyValuePair<string, float> item = input.Axis.ElementAt( i );
-                        input.Axis[ item.Key ] = rewiredPlayer.GetAxis( item.Key );
-                    }
-
-                    if( i < input.Buttons.Count )
-                    {
-                        KeyValuePair<string, bool> item = input.Buttons.ElementAt( i );
-                        input.Axis[ item.Key ] = rewiredPlayer.GetAxis( item.Key );
-                    }
-                }
-            }
-        }
-
-        private void InitializeActions( Input input )
-        {
-            input.Axis.Clear();
-            input.Buttons.Clear();
-
             foreach( InputAction action in actions )
             {
                 switch( action.type )
                 {
                     case InputActionType.Axis:
-                        input.Axis.Add( action.name, 0 );
+                        foreach( AxisInputEntityFilter entity in GetEntities<AxisInputEntityFilter>() )
+                        {
+                            AxisInput input = entity.InputComponent;
+                            Player rewiredPlayer = ( input.Id != 0 ) ? ReInput.players.GetPlayer( input.Id ) : ReInput.players.GetSystemPlayer();
+                            if( input.Names.Contains( action.name ) )
+                            {
+                                if( input.Values == null )
+                                    input.Values = new Dictionary<string, float>();
+
+                                float axis = rewiredPlayer.GetAxis( action.name );
+
+                                if( input.Values.ContainsKey( action.name ) )
+                                    input.Values[ action.name ] = axis;
+                                else
+                                    input.Values.Add( action.name, axis );
+                            }
+                        }
                         break;
                     
                     case InputActionType.Button:
-                        input.Buttons.Add( action.name, false );
+                        foreach( ButtonInputEntityFilter entity in GetEntities<ButtonInputEntityFilter>() )
+                        {
+                            ButtonInput input = entity.InputComponent;
+                            Player rewiredPlayer = ( input.Id != 0 ) ? ReInput.players.GetPlayer( input.Id ) : ReInput.players.GetSystemPlayer();
+
+                            if( input.Values == null )
+                                    input.Values = new Dictionary<string, bool>();
+
+                            if( input.Names.Contains( action.name ) )
+                            {
+                                bool button = rewiredPlayer.GetButton( action.name );
+                                if( input.Values.ContainsKey( action.name ) )
+                                    input.Values[ action.name ] = button;
+                                else
+                                    input.Values.Add( action.name, button );
+                            }
+                        }
                         break;
                 }
             }
