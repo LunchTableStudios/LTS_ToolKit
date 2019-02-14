@@ -2,25 +2,29 @@ namespace LTS_ToolKit.CharacterController
 {
     using UnityEngine;
     using Unity.Entities;
+    using Unity.Jobs;
+    using Unity.Burst;
     using Unity.Mathematics;
 
-    [ UpdateBefore( typeof( TransformSystem ) ) ]
-    public class VelocitySystem : ComponentSystem
+    public class VelocitySystem : JobComponentSystem
     {
-        private struct VelocityEntityFilter
+        [ BurstCompile ]
+        private struct SetVelocityDeltaJob : IJobProcessComponentData<Velocity>
         {
-            public Velocity VelocityComponent;
+            public float deltaTime;
+
+            public void Execute( ref Velocity velocity )
+            {
+                velocity.Delta = velocity.Value * deltaTime;
+            }
         }
 
-        protected override void OnUpdate()
+        protected override JobHandle OnUpdate( JobHandle inputDeps )
         {
-            float deltaTime = Time.deltaTime;
-            foreach( VelocityEntityFilter entity in GetEntities<VelocityEntityFilter>() )
+            return new SetVelocityDeltaJob()
             {
-                Velocity velocity = entity.VelocityComponent;
-                velocity.Delta = velocity.Value * deltaTime;
-                velocity.Value *= velocity.Friction;
-            }
+                deltaTime = Time.deltaTime
+            }.Schedule( this, inputDeps );
         }
     }
 }

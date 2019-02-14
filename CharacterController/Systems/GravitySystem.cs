@@ -2,23 +2,31 @@ namespace LTS_ToolKit.CharacterController
 {
     using UnityEngine;
     using Unity.Entities;
+    using Unity.Jobs;
+    using Unity.Burst;
+    using Unity.Collections;
 
     [ UpdateBefore( typeof( VelocitySystem ) ) ]
-    public class GravitySystem : ComponentSystem
+    public class GravitySystem : JobComponentSystem
     {
-        private struct GravityEntityFilter
+        [ BurstCompile ]
+        private struct ApplyGravityJob : IJobProcessComponentData<Velocity, Gravity>
         {
-            public readonly Gravity GravityComponent;
-            public Velocity VelocityComponent;
+            public float deltaTime;
+
+            public void Execute( ref Velocity velocity, [ ReadOnly ] ref Gravity gravity )
+            {
+                velocity.Value.y -= gravity.Value * deltaTime;
+            }
         }
 
-        protected override void OnUpdate()
+        protected override JobHandle OnUpdate( JobHandle inputDeps )
         {
-            float deltaTime = Time.deltaTime;
-            foreach( GravityEntityFilter entity in GetEntities<GravityEntityFilter>() )
+            return new ApplyGravityJob()
             {
-                entity.VelocityComponent.Value.y -= entity.GravityComponent.Value * deltaTime;
-            }
+                deltaTime = Time.deltaTime
+            }.Schedule( this, inputDeps );
         }
     }
 }
+
