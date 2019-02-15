@@ -8,8 +8,9 @@ namespace LTS_ToolKit.CharacterController
     using Unity.Transforms;
     using Unity.Collections;
     
-    public class MovementSystem : JobComponentSystem
+    public class PositionSystem : JobComponentSystem
     {
+        [ BurstCompile ]
         private struct ApplyVelocityToPositionJob : IJobProcessComponentData<Position, Velocity>
         {
             public void Execute( ref Position position, [ ReadOnly ] ref Velocity velocity )
